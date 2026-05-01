@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block tieu_de %}Lịch sử Học tập{% endblock %}
+{% block tieu_de_trang %}Lịch sử Học tập{% endblock %}
+
+{% block noi_dung %}
+<div class="the_noi_dung">
+    <h6 class="fw-bold mb-3">
+        <i class="bi bi-clock-history text-success me-2"></i>Lịch sử Học tập
+    </h6>
+    {% if ds_lich_su %}
+    <div class="table-responsive">
+        <table class="table bang table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Môn học</th>
+                    <th>Mã môn</th>
+                    <th>Tín chỉ</th>
+                    <th>Học kỳ</th>
+                    <th>Điểm cuối kỳ</th>
+                    <th>Kết quả</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for ls in ds_lich_su %}
+            <tr>
+                <td class="text-muted">{{ loop.index }}</td>
+                <td class="fw-semibold">{{ ls.mon_hoc.ten_mon }}</td>
+                <td><span class="badge bg-secondary">{{ ls.mon_hoc.ma_mon }}</span></td>
+                <td>{{ ls.mon_hoc.tin_chi }} TC</td>
+                <td>{{ ls.hoc_ky.ten_hoc_ky }}</td>
+                <td>
+                    {% if ls.diem_cuoi_ky is not none %}
+                    <strong>{{ ls.diem_cuoi_ky }}</strong>
+                    {% else %}
+                    <span class="text-muted">Chưa có</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if ls.diem_cuoi_ky is not none %}
+                        {% if ls.diem_cuoi_ky >= 5.0 %}
+                        <span class="badge bg-success"><i class="bi bi-check me-1"></i>Đạt</span>
+                        {% else %}
+                        <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Không đạt</span>
+                        {% endif %}
+                    {% else %}
+                    <span class="badge bg-secondary">Chưa có điểm</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+        Chưa có lịch sử học tập nào.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

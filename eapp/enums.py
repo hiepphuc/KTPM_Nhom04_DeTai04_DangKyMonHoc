@@ -12,5 +12,5 @@ class StatusRegistration(Enum):
 
 
 class StatusMidterm(Enum):
-    CHUA_THI = "chua_thi"
-    DA_THI = "da_thi"
+    NOT_STARTED = "chua_thi"
+    COMPLETED = "da_thi"

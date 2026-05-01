@@ -108,7 +108,7 @@ if __name__ == "__main__":
             name='Phúc',
             email='2351050135phuc@gmail.com',
             password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
-            role=Role.SINH_VIEN,
+            role=Role.STUDENT,
             active=True,
             created_at=datetime.now()
         )
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         db.session.add(sec)
         db.session.commit()
 
-        r=Registration(status=StatusRegister.DANG_KY,registration_time=datetime.now(),
+        r=Registration(status=StatusRegistration.REGISTRATION,registration_time=datetime.now(),
                        cancel_time=datetime.now(),student_id='1',section_id=sec.id,)
 
         db.session.add(r)
