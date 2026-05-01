@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer
 from datetime import datetime
 from __init__ import db, app
@@ -10,7 +11,7 @@ class BaseModel(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
 
 
-class Student(BaseModel):
+class Student(BaseModel,UserMixin):
     student_id = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
