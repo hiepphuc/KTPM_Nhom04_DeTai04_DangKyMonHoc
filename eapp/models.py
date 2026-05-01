@@ -1,8 +1,8 @@
 from flask import Flask
 from sqlalchemy import Column, Integer
 from datetime import datetime
-from eapp import db, app
-from eapp.enums import Role, StatusRegister
+from __init__ import db, app
+from enums import Role, StatusRegistration
 
 
 class BaseModel(db.Model):
@@ -15,7 +15,7 @@ class Student(BaseModel):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.Enum(Role), default=Role.SINH_VIEN, nullable=False)
+    role = db.Column(db.Enum(Role), default=Role.STUDENT, nullable=False)
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now())
 
@@ -68,7 +68,7 @@ class Section(BaseModel):
 
 
 class Registration(BaseModel):
-    status = db.Column(db.Enum(StatusRegister), default=StatusRegister.DANG_KY, nullable=False)
+    status = db.Column(db.Enum(StatusRegistration), default=StatusRegistration.REGISTRATION, nullable=False)
     registration_time = db.Column(db.DateTime, default=datetime.now)
     cancel_time = db.Column(db.DateTime, nullable=True)
 
