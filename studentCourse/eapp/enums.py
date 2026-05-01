@@ -6,11 +6,11 @@ class Role(Enum):
     ADMIN = "admin"
 
 
-class TrangThaiDangKy(Enum):
+class StatusRegister(Enum):
     DANG_KY = "dang_ky"
     DA_HUY = "da_huy"
 
 
-class TrangThaiGiuaKy(Enum):
+class StatusMidterm(Enum):
     CHUA_THI = "chua_thi"
     DA_THI = "da_thi"

@@ -2,7 +2,7 @@ from flask import Flask
 from sqlalchemy import Column, Integer
 from datetime import datetime
 from eapp import db, app
-from eapp.enums import Role, TrangThaiDangKy
+from eapp.enums import Role, StatusRegister
 
 
 class BaseModel(db.Model):
@@ -50,13 +50,13 @@ def __str__(self):
 
 class Section(BaseModel):
     section_code = db.Column(db.String(30), unique=True, nullable=False)
-    giang_vien = db.Column(db.String(100), nullable=False)
+    lecturer = db.Column(db.String(100), nullable=False)
     room = db.Column(db.String(20), nullable=False)
     day_of_week = db.Column(db.Integer, nullable=False)  # 2=Monday … 8=Sunday
     period_start = db.Column(db.Integer, nullable=False)  # 1-15
     period_end = db.Column(db.Integer, nullable=False)  # 1-15
     max_capacity = db.Column(db.Integer, default=50, nullable=False)
-    thi_giua_ki = db.Column(db.Boolean, default=False)
+    midterm = db.Column(db.Boolean, default=False)
 
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'), nullable=False)
@@ -68,9 +68,9 @@ class Section(BaseModel):
 
 
 class Registration(BaseModel):
-    status = db.Column(db.Enum(TrangThaiDangKy), default=TrangThaiDangKy.DANG_KY, nullable=False)
-    thoi_gian_dang_ky = db.Column(db.DateTime, default=datetime.now)
-    thoi_gian_huy = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.Enum(StatusRegister), default=StatusRegister.DANG_KY, nullable=False)
+    registration_time = db.Column(db.DateTime, default=datetime.now)
+    cancel_time = db.Column(db.DateTime, nullable=True)
 
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
@@ -87,7 +87,7 @@ class StudentHistory(BaseModel):
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'), nullable=False)
-    diem = db.Column(db.Float, nullable=True)
+    poin = db.Column(db.Float, nullable=True)
 
     __table_args__ = (
         db.UniqueConstraint('student_id', 'course_id', 'semester_id', name='uq_sinhvien_khoahoc_hocky'),
@@ -125,15 +125,15 @@ if __name__ == "__main__":
         db.session.add(se)
         db.session.commit()
 
-        sec=Section(section_code='KTPM02',giang_vien='Dương Hữu Thành',
+        sec=Section(section_code='KTPM02',lecturer='Dương Hữu Thành',
                     room='P201',day_of_week='3',period_start=1,period_end=1,
                     max_capacity=50,
-                    thi_giua_ki=False,course_id=c.id,semester_id=se.id)
+                    midterm=False,course_id=c.id,semester_id=se.id)
         db.session.add(sec)
         db.session.commit()
 
-        r=Registration(status=TrangThaiDangKy.DANG_KY,thoi_gian_dang_ky=datetime.now(),
-                       thoi_gian_huy=datetime.now(),student_id='1',section_id=sec.id,)
+        r=Registration(status=StatusRegister.DANG_KY,registration_time=datetime.now(),
+                       cancel_time=datetime.now(),student_id='1',section_id=sec.id,)
 
         db.session.add(r)
         db.session.commit()
