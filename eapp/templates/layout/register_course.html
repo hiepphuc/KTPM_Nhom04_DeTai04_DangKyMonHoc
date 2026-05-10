@@ -4,6 +4,136 @@
 
 {% block noi_dung %}
 
+<div class="card shadow-sm p-3 mb-4">
+    <form method="GET" class="d-flex align-items-center gap-3">
+        <label class="fw-semibold mb-0">Học kỳ:</label>
+        <select name="semester_id" class="form-select w-auto"
+                onchange="this.form.submit()">
+            <option value="">-- Chọn học kỳ --</option>
+            {% for hk in semesters %}
+            <option value="{{ hk.id }}"
+                {% if hk.id == semester_id %}selected{% endif %}>
+                {{ hk.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
 
+{% if semester_id %}
+<div class="row g-4">
+
+    <!-- Danh sách lớp có thể đăng ký -->
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-list-ul text-primary me-2"></i>Danh sách lớp học phần
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã lớp</th>
+                            <th>Môn học</th>
+                            <th>Giảng viên</th>
+                            <th>Lịch</th>
+                            <th>Phòng</th>
+                            <th>Sĩ số</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for sec in sections %}
+                    {% set so_dk = sec.registrations|selectattr('status.value','equalto','dang_ky')|list|length %}
+                    <tr class="{% if so_dk >= sec.max_capacity %}table-secondary{% endif %}">
+                        <td><strong>{{ sec.section_code }}</strong></td>
+                        <td>{{ sec.course }}</td>
+                        <td><small>{{ sec.lecturer }}</small></td>
+                        <td><small>Thứ {{ sec.day_of_week }}<br>Tiết {{ sec.period_start }}-{{ sec.period_end }}</small></td>
+                        <td>{{ sec.room }}</td>
+                        <td>
+                            <span class="{% if so_dk >= sec.max_capacity %}text-danger{% else %}text-success{% endif %}">
+                                {{ so_dk }}/{{ sec.max_capacity }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if so_dk < sec.max_capacity %}
+                            <form method="POST" action="{{ url_for('add_registration') }}">
+                                <input type="hidden" name="section_id"  value="{{ sec.id }}">
+                                <input type="hidden" name="semester_id" value="{{ semester_id }}">
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="badge bg-secondary">Đầy</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">
+                            Không có lớp học phần nào.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Môn đã đăng ký -->
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-journal-check text-success me-2"></i>Môn đã đăng ký
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Môn học</th><th>Lịch</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    {% for reg in my_registrations %}
+                    <tr>
+                        <td>
+                            <strong>{{ reg.section.section_code }}</strong><br>
+                            <small class="text-muted">{{ reg.section.course }}</small>
+                        </td>
+                        <td>
+                            <small>Thứ {{ reg.section.day_of_week }}<br>
+                            Tiết {{ reg.section.period_start }}-{{ reg.section.period_end }}</small>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('cancel_registration') }}"
+                                  onsubmit="return confirm('Huỷ đăng ký môn này?')">
+                                <input type="hidden" name="registration_id" value="{{ reg.id }}">
+                                <input type="hidden" name="semester_id"     value="{{ semester_id }}">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            Chưa đăng ký môn nào.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>Vui lòng chọn học kỳ để xem danh sách lớp.
+</div>
+{% endif %}
 
 {% endblock %}
