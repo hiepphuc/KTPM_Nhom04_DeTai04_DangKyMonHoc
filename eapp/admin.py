@@ -1,6 +1,7 @@
 from flask import session, flash, redirect, url_for
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
+from wtforms import ValidationError
 
 from models import *
 from flask_admin import Admin
@@ -86,13 +87,50 @@ class SectionView(AuthenticatedModelView):
         'room', 'day_of_week', 'period_start', 'period_end', 'max_capacity'
     ]
 
+    def delete_model(self, model):
+        so_sv = Registration.query.filter_by(
+            section_id=model.id,
+            status=StatusRegistration.REGISTRATION
+        ).count()
+        if so_sv > 0:
+            flash(
+                f"Không thể xoá lớp "
+            )
+            return False
+        return super().delete_model(model)
+
+    def on_model_change(self, form, model, is_created):
+        if model.max_capacity > 50:
+            raise ValidationError("Sĩ số tối đa mỗi lớp không được vượt quá 50!")
+
+        if model.max_capacity < 1:
+            raise ValidationError("Sĩ số tối đa phải lớn hơn 0!")
+
+        semester_id = form.semester.data.id if form.semester.data else None
+        if not semester_id:
+            raise ValidationError("Vui lòng chọn học kỳ!")
+
+        query = Section.query.filter(
+            Section.room == model.room,
+            Section.day_of_week == model.day_of_week,
+            Section.semester_id == semester_id,
+            Section.id != model.id
+        ).all()
+
+        for lop_cu in query:
+            if not (int(model.period_end) < int(lop_cu.period_start) or
+                    int(model.period_start) > int(lop_cu.period_end)):
+                raise ValidationError(
+                    f"Trùng phòng với lớp '{lop_cu.section_code}' "
+                )
+
     column_filters = ['course', 'semester']
 
 
 class RegistrationView(AuthenticatedModelView):
     can_export  = True
-    can_create  = False   # Admin không tự tạo đăng ký
-    can_edit    = False   # Chỉ xem
+    can_create  = False
+    can_edit    = False
     column_searchable_list = ['student_id']
     column_filters         = ['status', 'section_id']
     column_list = [
