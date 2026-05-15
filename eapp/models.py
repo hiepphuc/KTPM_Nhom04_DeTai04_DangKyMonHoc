@@ -51,9 +51,9 @@ class Section(BaseModel):
     section_code = db.Column(db.String(30), unique=True, nullable=False)
     lecturer = db.Column(db.String(100), nullable=False)
     room = db.Column(db.String(20), nullable=False)
-    day_of_week = db.Column(db.Integer, nullable=False)  # 2=Monday … 8=Sunday
-    period_start = db.Column(db.Integer, nullable=False)  # 1-15
-    period_end = db.Column(db.Integer, nullable=False)  # 1-15
+    day_of_week = db.Column(db.Integer, nullable=False)
+    period_start = db.Column(db.Integer, nullable=False)
+    period_end = db.Column(db.Integer, nullable=False)
     max_capacity = db.Column(db.Integer, default=50, nullable=False)
     midterm = db.Column(db.Boolean, default=False)
 
@@ -90,6 +90,9 @@ class StudentHistory(BaseModel):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'), nullable=False)
     poin = db.Column(db.Float, nullable=True)
+
+    course = db.relationship('Course', backref='history')
+    semester = db.relationship('Semester', backref='history')
 
     __table_args__ = (
         db.UniqueConstraint('student_id', 'course_id', 'semester_id', name='uq_sinhvien_khoahoc_hocky'),

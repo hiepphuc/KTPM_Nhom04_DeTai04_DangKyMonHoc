@@ -24,8 +24,10 @@ def home_page():
 @app.route('/student-history')
 @flask_login.login_required
 def student_history():
-    history = dao.get_student_history(current_user.id)
-    return render_template('layout/student_history.html', history=history)
+    history, registered = dao.get_student_history(current_user.id)
+    return render_template('layout/student_history.html',
+                           history=history,
+                           registered=registered)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,7 +50,6 @@ def login():
 
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
-    # Nếu đã đăng nhập admin rồi thì vào thẳng
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
         return redirect('/admin')
 
