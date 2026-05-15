@@ -22,8 +22,10 @@ def home_page():
     return render_template('layout/index.html')
 
 @app.route('/student-history')
+@flask_login.login_required
 def student_history():
-    return render_template('layout/student_history.html')
+    history = dao.get_student_history(current_user.id)
+    return render_template('layout/student_history.html', history=history)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
