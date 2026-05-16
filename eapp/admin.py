@@ -114,14 +114,19 @@ class SectionView(AuthenticatedModelView):
             Section.room == model.room,
             Section.day_of_week == model.day_of_week,
             Section.semester_id == semester_id,
-            Section.id != model.id
-        ).all()
+        )
 
-        for lop_cu in query:
+        # if model.id:
+        #     query = query.filter(Section.id != model.id)
+
+        danh_sach = query.all()
+
+        for lop_cu in danh_sach:
             if not (int(model.period_end) < int(lop_cu.period_start) or
                     int(model.period_start) > int(lop_cu.period_end)):
                 raise ValidationError(
-                    f"Trùng phòng với lớp '{lop_cu.section_code}' "
+                    f"Phòng '{model.room}' đã có lớp '{lop_cu.section_code}' "
+                    f"Thứ {lop_cu.day_of_week}, Tiết {lop_cu.period_start}-{lop_cu.period_end}!"
                 )
 
     column_filters = ['course', 'semester']
@@ -140,7 +145,7 @@ class RegistrationView(AuthenticatedModelView):
         'student_id'       : 'Sinh viên',
         'section_id'       : 'Lớp học phần',
         'status'        : 'Trạng thái',
-        'registered_time' : 'Ngày đăng ký',
+        'registration_time' : 'Ngày đăng ký',
         'cancel_time'  : 'Ngày huỷ'
     }
 
