@@ -26,11 +26,23 @@ class Student(BaseModel,UserMixin):
     def __str__(self):
         return self.name
 
+prerequisite_table = db.Table('prerequisite',
+    db.Column('course_id',       db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('prerequisite_id', db.Integer, db.ForeignKey('course.id'), primary_key=True)
+)
 
 class Course(BaseModel):
     course_code = db.Column(db.String(20), unique=True, nullable=False)
     course_name = db.Column(db.String(150), nullable=False)
     credits = db.Column(db.Integer, nullable=False)
+
+    prerequisites = db.relationship(
+        'Course',
+        secondary=prerequisite_table,
+        primaryjoin='Course.id == prerequisite.c.course_id',
+        secondaryjoin='Course.id == prerequisite.c.prerequisite_id',
+        backref='required_by'
+    )
 
     def __str__(self):
         return self.course_name
@@ -123,6 +135,16 @@ if __name__ == "__main__":
         # c=Course(course_code='KTPM1',course_name='Kiểm thử phần mềm02',credits='3')
         # db.session.add(c)
         # db.session.commit()
+
+        mon_chinh = Course(course_code='KTPM4', course_name='Kiểm thử phần mềm 4', credits=3)
+        db.session.add(mon_chinh)
+        db.session.flush()
+        mon_tq = Course.query.filter_by(course_code='KTPM3').first()
+
+        if mon_tq:
+            mon_chinh.prerequisites.append(mon_tq)
+
+        db.session.commit()
         #
         # se=Semester(name="Học kỳ 3",start_date=datetime.now(),
         #             end_date=datetime(2026,11,21),
@@ -147,14 +169,14 @@ if __name__ == "__main__":
         # db.session.add(student)
         # db.session.commit()
 
-        s = Student(
-            student_id='2351050137',
-            name='Phúc 1',
-            email='2351050137phuc@gmail.com',
-            password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
-            role=Role.ADMIN,
-            active=True,
-            created_at=datetime.now()
-        )
-        db.session.add(s)
-        db.session.commit()
+        # s = Student(
+        #     student_id='2351050137',
+        #     name='Phúc 1',
+        #     email='2351050137phuc@gmail.com',
+        #     password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
+        #     role=Role.ADMIN,
+        #     active=True,
+        #     created_at=datetime.now()
+        # )
+        # db.session.add(s)
+        # db.session.commit()

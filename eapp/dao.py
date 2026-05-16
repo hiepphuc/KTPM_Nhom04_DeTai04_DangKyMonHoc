@@ -57,6 +57,16 @@ def register_course(student_id, section_id):
     if da_hoc:
         return False, "Bạn đã hoàn thành môn này rồi!"
 
+    for mon_tq in course.prerequisites:
+        da_pass = StudentHistory.query.filter(
+            StudentHistory.student_id == student_id,
+            StudentHistory.course_id == mon_tq.id,
+            StudentHistory.poin != None,
+            StudentHistory.poin >= 5.0
+        ).first()
+        if not da_pass:
+            return False, f"Chưa hoàn thành môn tiên quyết: '{mon_tq.course_name}'!"
+
     existing_active = Registration.query.filter_by(
         student_id=student_id,
         section_id=section_id,

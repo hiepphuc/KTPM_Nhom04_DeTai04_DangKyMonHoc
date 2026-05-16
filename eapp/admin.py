@@ -36,11 +36,12 @@ class StudentView(AuthenticatedModelView):
 class CourseView(AuthenticatedModelView):
     can_export = True
     column_searchable_list = ['course_code', 'course_name']
-    column_list = ['course_code', 'course_name', 'credits']
+    column_list = ['course_code', 'course_name', 'credits', 'prerequisites']
     column_labels = {
         'course_code' : 'Mã môn',
         'course_name' : 'Tên môn học',
-        'credits'     : 'Tín chỉ'
+        'credits'     : 'Tín chỉ',
+        'prerequisites': 'Môn tiên quyết'
     }
     form_excluded_columns = ['sections', 'history_records', 'prereqs', 'required_by']
 
