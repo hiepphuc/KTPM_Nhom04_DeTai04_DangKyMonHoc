@@ -39,13 +39,13 @@ class Course(BaseModel):
     prerequisites = db.relationship(
         'Course',
         secondary=prerequisite_table,
-        primaryjoin=(prerequisite_table.c.course_id == id),
-        secondaryjoin=(prerequisite_table.c.prerequisite_id == id),
+        primaryjoin='Course.id == prerequisite.c.course_id',
+        secondaryjoin='Course.id == prerequisite.c.prerequisite_id',
         backref='required_by'
     )
 
-def __str__(self):
-    return self.course_name
+    def __str__(self):
+        return self.course_name
 
 
 class Semester(BaseModel):
