@@ -26,15 +26,26 @@ class Student(BaseModel):
 def __str__(self):
     return self.name
 
+prerequisite_table = db.Table('prerequisite',
+    db.Column('course_id',       db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('prerequisite_id', db.Integer, db.ForeignKey('course.id'), primary_key=True)
+)
 
 class Course(BaseModel):
     course_code = db.Column(db.String(20), unique=True, nullable=False)
     course_name = db.Column(db.String(150), nullable=False)
     credits = db.Column(db.Integer, nullable=False)
 
+    prerequisites = db.relationship(
+        'Course',
+        secondary=prerequisite_table,
+        primaryjoin='Course.id == prerequisite.c.course_id',
+        secondaryjoin='Course.id == prerequisite.c.prerequisite_id',
+        backref='required_by'
+    )
 
-def __str__(self):
-    return self.course_name
+    def __str__(self):
+        return self.course_name
 
 
 class Semester(BaseModel):
