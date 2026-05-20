@@ -2,14 +2,13 @@ from flask import Flask
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer
 from datetime import datetime
-from __init__ import db, app
-from enums import Role, StatusRegistration
+from eapp import db, app
+from eapp.enums import Role, StatusRegistration
 
 
 class BaseModel(db.Model):
     __abstract__ = True
     id = Column(Integer, primary_key=True, autoincrement=True)
-
 
 class Student(BaseModel,UserMixin):
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -18,8 +17,9 @@ class Student(BaseModel,UserMixin):
     password = db.Column(db.String(256), nullable=False)
     role = db.Column(db.Enum(Role), default=Role.STUDENT, nullable=False)
     active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
+    __table_args__ = {'extend_existing': True}
     # dang_ky_list = db.relationship('DangKy', backref='sinh_vien', lazy=True)
     # lich_su_list = db.relationship('LichSuHocTap', backref='sinh_vien', lazy=True
 
@@ -28,7 +28,8 @@ class Student(BaseModel,UserMixin):
 
 prerequisite_table = db.Table('prerequisite',
     db.Column('course_id',       db.Integer, db.ForeignKey('course.id'), primary_key=True),
-    db.Column('prerequisite_id', db.Integer, db.ForeignKey('course.id'), primary_key=True)
+    db.Column('prerequisite_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    extend_existing=True
 )
 
 class Course(BaseModel):
@@ -44,6 +45,7 @@ class Course(BaseModel):
         backref='required_by'
     )
 
+    __table_args__ = {'extend_existing': True}
     def __str__(self):
         return self.course_name
 
@@ -54,7 +56,7 @@ class Semester(BaseModel):
     end_date = db.Column(db.Date, nullable=False)
     registration_deadline = db.Column(db.DateTime, nullable=False)
 
-
+    __table_args__ = {'extend_existing': True}
     def __str__(self):
         return self.name
 
@@ -77,6 +79,7 @@ class Section(BaseModel):
 
     registrations = db.relationship('Registration', backref='section', lazy=True)
 
+    __table_args__ = {'extend_existing': True}
     def __str__(self):
         return self.section_code
 
@@ -89,10 +92,8 @@ class Registration(BaseModel):
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
 
-    __table_args__ = (
-        db.UniqueConstraint('student_id', 'section_id', name='uq_sinhvien_lophocphan'),
-    )
-
+    student = db.relationship('Student', backref='registrations')
+    __table_args__ = {'extend_existing': True}
     def __str__(self):
         return self.id
 
@@ -106,12 +107,10 @@ class StudentHistory(BaseModel):
     course = db.relationship('Course', backref='history')
     semester = db.relationship('Semester', backref='history')
 
-    __table_args__ = (
-        db.UniqueConstraint('student_id', 'course_id', 'semester_id', name='uq_sinhvien_khoahoc_hocky'),
-    )
-
-    def str(self):
-        return self.id
+    student = db.relationship('Student', backref='history_records')
+    __table_args__ = {'extend_existing': True}
+    def __str__(self):
+        return str(self.id)
 
 
 if __name__ == "__main__":
@@ -120,21 +119,21 @@ if __name__ == "__main__":
 
         import hashlib
 
-        # s = Student(
-        #     student_id='2351050135',
-        #     name='Phúc',
-        #     email='2351050135phuc@gmail.com',
-        #     password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
-        #     role=Role.STUDENT,
-        #     active=True,
-        #     created_at=datetime.now()
-        # )
-        # db.session.add(s)
-        # db.session.commit()
-        #
-        # c=Course(course_code='KTPM1',course_name='Kiểm thử phần mềm02',credits='3')
-        # db.session.add(c)
-        # db.session.commit()
+        s = Student(
+            student_id='2351050135',
+            name='Phúc',
+            email='2351050135phuc@gmail.com',
+            password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
+            role=Role.STUDENT,
+            active=True,
+            created_at=datetime.now()
+        )
+        db.session.add(s)
+        db.session.commit()
+
+        c=Course(course_code='KTPM1',course_name='Kiểm thử phần mềm02',credits=3)
+        db.session.add(c)
+        db.session.commit()
 
         mon_chinh = Course(course_code='KTPM4', course_name='Kiểm thử phần mềm 4', credits=3)
         db.session.add(mon_chinh)
@@ -145,38 +144,38 @@ if __name__ == "__main__":
             mon_chinh.prerequisites.append(mon_tq)
 
         db.session.commit()
-        #
-        # se=Semester(name="Học kỳ 3",start_date=datetime.now(),
-        #             end_date=datetime(2026,11,21),
-        #             registration_deadline=datetime.now())
-        # db.session.add(se)
-        # db.session.commit()
-        #
-        # sec=Section(section_code='KTPM02',lecturer='Dương Hữu Thành',
-        #             room='P201',day_of_week='3',period_start=1,period_end=1,
-        #             max_capacity=50,
-        #             midterm=False,course_id=c.id,semester_id=se.id)
-        # db.session.add(sec)
-        # db.session.commit()
-        #
-        # r=Registration(status=StatusRegistration.REGISTRATION,registration_time=datetime.now(),
-        #                cancel_time=datetime.now(),student_id='1',section_id=sec.id,)
-        #
-        # db.session.add(r)
-        # db.session.commit()
-        #
-        # student = StudentHistory(student_id='1', course_id=c.id, semester_id=sec.id)
-        # db.session.add(student)
-        # db.session.commit()
 
-        # s = Student(
-        #     student_id='2351050137',
-        #     name='Phúc 1',
-        #     email='2351050137phuc@gmail.com',
-        #     password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
-        #     role=Role.ADMIN,
-        #     active=True,
-        #     created_at=datetime.now()
-        # )
-        # db.session.add(s)
-        # db.session.commit()
+        se=Semester(name="Học kỳ 3",start_date=datetime.now(),
+                    end_date=datetime(2026,11,21),
+                    registration_deadline=datetime.now())
+        db.session.add(se)
+        db.session.commit()
+
+        sec=Section(section_code='KTPM02',lecturer='phúc',
+                    room='P201',day_of_week=3,period_start=1,period_end=1,
+                    max_capacity=50,
+                    midterm=False,course_id=c.id,semester_id=se.id)
+        db.session.add(sec)
+        db.session.commit()
+
+        r=Registration(status=StatusRegistration.REGISTRATION,registration_time=datetime.now(),
+                       cancel_time=datetime.now(),student_id='1',section_id=sec.id,)
+
+        db.session.add(r)
+        db.session.commit()
+
+        student = StudentHistory(student_id='1', course_id=c.id, semester_id=sec.id)
+        db.session.add(student)
+        db.session.commit()
+
+        s = Student(
+            student_id='2351050137',
+            name='Phúc 1',
+            email='2351050137phuc@gmail.com',
+            password=str(hashlib.md5("123456".encode('utf-8')).hexdigest()),
+            role=Role.ADMIN,
+            active=True,
+            created_at=datetime.now()
+        )
+        db.session.add(s)
+        db.session.commit()

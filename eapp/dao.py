@@ -1,4 +1,4 @@
-from models import *
+from eapp.models import *
 from datetime import datetime, date, timedelta
 import hashlib
 
@@ -14,6 +14,13 @@ def login(student_id, password):
     ).first()
 
 def register(name, email, password, student_id):
+    if Student.query.filter_by(student_id=student_id).first():
+        raise ValueError("Mã số sinh viên đã tồn tại!")
+
+    if Student.query.filter_by(email=email).first():
+        raise ValueError("Email đã được sử dụng!")
+
+
     s = Student(
         name=name, email=email, student_id=student_id,
         role=Role.STUDENT, active=True, created_at=datetime.now(),

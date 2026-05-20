@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class Role(Enum):
-    STUDENT = "sinh_vien"
-    ADMIN = "admin"
+    STUDENT = "STUDENT"
+    ADMIN = "ADMIN"
 
 
 class StatusRegistration(Enum):

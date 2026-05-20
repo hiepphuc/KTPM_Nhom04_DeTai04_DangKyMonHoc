@@ -1,12 +1,15 @@
 import hashlib
-import admin
+
+import flask_login
+
+from eapp import admin, dao
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user
-from __init__ import app
-from __init__ import login_manager
-import dao,flask_login
-from enums import Role
-from models import Student
+from eapp import app
+from eapp import login_manager
+
+from eapp.enums import Role
+from eapp.models import Student
 
 
 @app.context_processor
@@ -84,12 +87,6 @@ def register():
         if password != password_confirm:
             return render_template('layout/register.html', err_msg="Mật khẩu không khớp!")
 
-        if dao.get_student_by_studentid(student_id):
-            return render_template('layout/register.html', err_msg="Mã số sinh viên đã tồn tại!")
-
-        if dao.get_student_by_email(email):
-            return render_template('layout/register.html', err_msg="Email đã được sử dụng!")
-
         try:
             dao.register(
                 name=name,
@@ -99,8 +96,12 @@ def register():
             )
             flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
             return redirect(url_for('login'))
-        except Exception as ex:
-            return render_template('layout/register.html', err_msg="Không thể đăng ký, vui lòng thử lại!")
+        except ValueError as e:  # ← bắt ValueError riêng
+                return render_template('layout/register.html', err_msg=str(e))
+        except Exception:
+                return render_template('layout/register.html',
+                                   err_msg="Không thể đăng ký, vui lòng thử lại!")
+
 
     return render_template('layout/register.html')
 
@@ -151,7 +152,4 @@ def cancel_registration():
     return redirect(url_for('register_course', semester_id=semester_id))
 
 if __name__=="__main__":
-
-
-
     app.run(debug=True)
