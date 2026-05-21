@@ -148,8 +148,8 @@ if __name__ == "__main__":
         db.session.commit()
 
         se=Semester(name="Học kỳ 3",start_date=datetime.now(),
-                    end_date=datetime(2026,11,21),
-                    registration_deadline=datetime.now())
+                    end_date=datetime(2026,5,21),
+                    registration_deadline=datetime(2026,6,30))
         db.session.add(se)
         db.session.commit()
 
@@ -184,4 +184,62 @@ if __name__ == "__main__":
             created_at=datetime.now()
         )
         db.session.add(s)
+        db.session.commit()
+
+        ctdl = Course(course_code='IT001', course_name='Cấu trúc Dữ liệu', credits=4)
+        oop = Course(course_code='IT002', course_name='Lập trình Hướng Đối tượng', credits=3)
+        csdl = Course(course_code='IT003', course_name='Cơ sở Dữ liệu', credits=3)
+        mmt = Course(course_code='IT004', course_name='Mạng Máy tính', credits=3)
+        cnpm = Course(course_code='IT005', course_name='Công nghệ Phần mềm', credits=3)
+        web = Course(course_code='IT006', course_name='Lập trình Web', credits=3)
+        trd = Course(course_code='MA001', course_name='Toán Rời rạc', credits=3)
+        gtich = Course(course_code='MA002', course_name='Giải tích', credits=4)
+        ktpm = Course(course_code='IT007', course_name='Kiểm thử Phần mềm', credits=3)
+
+        db.session.add_all([ctdl, oop, csdl, mmt, cnpm, web, trd, gtich, ktpm])
+        db.session.commit()
+
+        lop_ctdl = Section(section_code='IT001.L1', course_id=ctdl.id,
+                           semester_id=se.id, lecturer='TS. Nam',
+                           room='P101', day_of_week=2,
+                           period_start=1, period_end=4, max_capacity=50)
+
+        lop_oop = Section(section_code='IT002.L1', course_id=oop.id,
+                          semester_id=se.id, lecturer='ThS. Hương',
+                          room='P102', day_of_week=3,
+                          period_start=1, period_end=3, max_capacity=50)
+
+        lop_csdl = Section(section_code='IT003.L1', course_id=csdl.id,
+                           semester_id=se.id, lecturer='PGS. Bảo',
+                           room='P103', day_of_week=4,
+                           period_start=1, period_end=3, max_capacity=50)
+
+        lop_mmt = Section(section_code='IT004.L1', course_id=mmt.id,
+                          semester_id=se.id, lecturer='TS. Long',
+                          room='P104', day_of_week=5,
+                          period_start=1, period_end=3, max_capacity=50)
+
+        lop_cnpm = Section(section_code='IT005.L1', course_id=cnpm.id,
+                           semester_id=se.id, lecturer='PGS. Hiển',
+                           room='P105', day_of_week=6,
+                           period_start=1, period_end=3, max_capacity=50)
+
+        lop_web = Section(section_code='IT006.L1', course_id=web.id,
+                          semester_id=se.id, lecturer='ThS. Mai',
+                          room='P106', day_of_week=7,
+                          period_start=1, period_end=3, max_capacity=50)
+
+        lop_trd = Section(section_code='MA001.L1', course_id=trd.id,
+                          semester_id=se.id, lecturer='TS. Tuấn',
+                          room='P107', day_of_week=2,
+                          period_start=5, period_end=7, max_capacity=50)
+
+        lop_gtich = Section(section_code='MA002.L1', course_id=gtich.id,
+                            semester_id=se.id, lecturer='TS. Linh',
+                            room='P108', day_of_week=3,
+                            period_start=5, period_end=8, max_capacity=50)
+
+        db.session.add_all([
+            lop_ctdl, lop_oop, lop_csdl, lop_mmt, lop_cnpm,
+            lop_web, lop_trd, lop_gtich])
         db.session.commit()
