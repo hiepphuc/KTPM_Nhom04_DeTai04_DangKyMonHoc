@@ -17,6 +17,18 @@
             </option>
             {% endfor %}
         </select>
+        {% if semester_id %}
+        <div class="alert alert-primary shadow-sm  justify-content-between align-items-center">
+            <div>
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                Tổng số tín chỉ đã đăng ký
+            </div>
+
+            <span >
+        {{ tong_tin_chi }} tín chỉ
+    </span>
+        </div>
+        {% endif %}
     </form>
 </div>
 

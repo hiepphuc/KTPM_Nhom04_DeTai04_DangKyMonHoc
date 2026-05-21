@@ -79,6 +79,7 @@ def register_course(student_id, section_id):
         section_id=section_id,
         status=StatusRegistration.REGISTRATION
     ).first()
+    
     if existing_active:
         return False, "Bạn đã đăng ký lớp này rồi!"
 
@@ -108,6 +109,14 @@ def register_course(student_id, section_id):
     if tong_tc + course.credits > 25:
         return False, "Đăng ký tối đa 25 tín chỉ!"
 
+    canh_bao = None
+
+    if tong_tc + course.credits < 12:
+        canh_bao = (
+            f"Đăng ký thành công! "
+            f"Cần đăng ký tối thiểu 12 tín chỉ."
+        )
+
     existing_cancelled = Registration.query.filter_by(
         student_id=student_id,
         section_id=section_id,
@@ -126,6 +135,9 @@ def register_course(student_id, section_id):
         ))
 
     db.session.commit()
+    if canh_bao:
+        return True, canh_bao
+
     return True, "Đăng ký thành công!"
 
 

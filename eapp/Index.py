@@ -128,11 +128,18 @@ def register_course():
         sections         = dao.get_sections_by_semester(semester_id)
         my_registrations = dao.get_registered_sections(current_user.id)
 
+    tong_tin_chi = sum(
+        reg.section.course.credits
+        for reg in my_registrations
+    )
+
     return render_template('layout/register_course.html',
                            semesters=semesters,
                            sections=sections,
                            my_registrations=my_registrations,
-                           semester_id=semester_id)
+                           semester_id=semester_id,
+                           tong_tin_chi=tong_tin_chi
+                           )
 
 
 @app.route('/register-course/add', methods=['POST'])
