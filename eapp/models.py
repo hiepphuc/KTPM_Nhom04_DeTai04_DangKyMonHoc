@@ -20,8 +20,6 @@ class Student(BaseModel,UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     __table_args__ = {'extend_existing': True}
-    # dang_ky_list = db.relationship('DangKy', backref='sinh_vien', lazy=True)
-    # lich_su_list = db.relationship('LichSuHocTap', backref='sinh_vien', lazy=True
 
     def __str__(self):
         return self.name

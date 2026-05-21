@@ -4,7 +4,7 @@ import flask_login
 
 from eapp import admin, dao
 from flask import Flask, render_template, request, flash, redirect, url_for
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from eapp import app
 from eapp import login_manager
 
@@ -31,6 +31,11 @@ def student_history():
     return render_template('layout/student_history.html',
                            history=history,
                            registered=registered)
+
+@app.route('/student-info')
+@login_required
+def student_info():
+    return render_template('layout/student_info.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
