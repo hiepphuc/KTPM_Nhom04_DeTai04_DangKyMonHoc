@@ -3,60 +3,77 @@
 {% block tieu_de_trang %}Lịch sử Học tập{% endblock %}
 
 {% block noi_dung %}
-<div class="the_noi_dung">
-    <h6 class="fw-bold mb-3">
-        <i class="bi bi-clock-history text-success me-2"></i>Lịch sử Học tập
-    </h6>
-    {% if ds_lich_su %}
-    <div class="table-responsive">
-        <table class="table bang table-hover">
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold">
+        <i class="bi bi-clock-history text-success me-2"></i>
+        Lịch sử học tập của {{ current_user.name }}
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr>
                     <th>#</th>
                     <th>Môn học</th>
-                    <th>Mã môn</th>
-                    <th>Tín chỉ</th>
                     <th>Học kỳ</th>
-                    <th>Điểm cuối kỳ</th>
+                    <th>Điểm</th>
                     <th>Kết quả</th>
                 </tr>
             </thead>
             <tbody>
-            {% for ls in ds_lich_su %}
+            {% for h in history %}
             <tr>
                 <td class="text-muted">{{ loop.index }}</td>
-                <td class="fw-semibold">{{ ls.mon_hoc.ten_mon }}</td>
-                <td><span class="badge bg-secondary">{{ ls.mon_hoc.ma_mon }}</span></td>
-                <td>{{ ls.mon_hoc.tin_chi }} TC</td>
-                <td>{{ ls.hoc_ky.ten_hoc_ky }}</td>
                 <td>
-                    {% if ls.diem_cuoi_ky is not none %}
-                    <strong>{{ ls.diem_cuoi_ky }}</strong>
+                    <strong>{{ h.course.course_name }}</strong><br>
+                    <small class="text-muted">{{ h.course.course_code }}</small>
+                </td>
+                <td>{{ h.semester.name }}</td>
+                <td>
+                    {% if h.poin is not none %}
+                        <strong>{{ h.poin }}</strong>
                     {% else %}
-                    <span class="text-muted">Chưa có</span>
+                        <span class="text-muted">Chưa có</span>
                     {% endif %}
                 </td>
                 <td>
-                    {% if ls.diem_cuoi_ky is not none %}
-                        {% if ls.diem_cuoi_ky >= 5.0 %}
-                        <span class="badge bg-success"><i class="bi bi-check me-1"></i>Đạt</span>
+                    {% if h.poin is not none %}
+                        {% if h.poin >= 5.0 %}
+                        <span class="badge bg-success">Đạt</span>
                         {% else %}
-                        <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Không đạt</span>
+                        <span class="badge bg-danger">Không đạt</span>
                         {% endif %}
                     {% else %}
-                    <span class="badge bg-secondary">Chưa có điểm</span>
+                        <span class="badge bg-secondary">Chưa có điểm</span>
                     {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                    Chưa có lịch sử học tập nào.
                 </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-    {% else %}
-    <div class="text-center py-5 text-muted">
-        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-        Chưa có lịch sử học tập nào.
-    </div>
-    {% endif %}
+
+    {% if history %}
+<div class="card-footer bg-white">
+    {% set co_diem   = history | selectattr('poin', 'ne', none) | list %}
+    {% set dat       = co_diem  | selectattr('poin', 'ge', 5.0) | list %}
+    {% set khong_dat = co_diem  | selectattr('poin', 'lt', 5.0) | list %}
+
+    <small class="text-muted">
+        Tổng số môn: <strong>{{ history|length }}</strong> &nbsp;|&nbsp;
+        Đạt: <strong class="text-success">{{ dat|length }}</strong> &nbsp;|&nbsp;
+        Không đạt: <strong class="text-danger">{{ khong_dat|length }}</strong> &nbsp;|&nbsp;
+        Chưa có điểm: <strong class="text-secondary">{{ history|length - co_diem|length }}</strong>
+    </small>
 </div>
+{% endif %}
+</div>
+
 {% endblock %}
