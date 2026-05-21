@@ -63,7 +63,7 @@ class SemesterView(AuthenticatedModelView):
         'end_date'              : 'Ngày kết thúc',
         'registration_deadline' : 'Hạn đăng ký'
     }
-    form_excluded_columns = ['sections', 'history_records']
+    form_excluded_columns = ['sections','history']
 
 
 

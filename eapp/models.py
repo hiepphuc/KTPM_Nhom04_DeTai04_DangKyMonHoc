@@ -129,8 +129,12 @@ if __name__ == "__main__":
         db.session.add(s)
         db.session.commit()
 
-        c=Course(course_code='KTPM1',course_name='Kiểm thử phần mềm02',credits=3)
+        c=Course(course_code='KTPM2',course_name='Kiểm thử phần mềm02',credits=3)
         db.session.add(c)
+        db.session.commit()
+
+        mon_tq = Course(course_code='KTPM3', course_name='Kiểm thử phần mềm 3', credits=3)
+        db.session.add(mon_tq)
         db.session.commit()
 
         mon_chinh = Course(course_code='KTPM4', course_name='Kiểm thử phần mềm 4', credits=3)
@@ -164,6 +168,10 @@ if __name__ == "__main__":
 
         student = StudentHistory(student_id='1', course_id=c.id, semester_id=sec.id)
         db.session.add(student)
+        db.session.commit()
+
+        student1=StudentHistory(student_id='1', course_id=mon_tq.id, semester_id=sec.id,poin=8)
+        db.session.add(student1)
         db.session.commit()
 
         s = Student(
