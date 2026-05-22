@@ -3,6 +3,8 @@ from datetime import datetime
 
 import pytest
 from flask import Flask
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 
 from eapp import app as flask_app, db
 from eapp.enums import Role
@@ -88,3 +90,10 @@ def create_student_history(test_app,create_semester,create_course,create_student
     db.session.refresh(history)
 
     return history
+
+@pytest.fixture
+def driver():
+    service = Service(executable_path='.venv/chromedriver.exe')
+    driver = webdriver.Chrome(service=service)
+    yield driver
+    driver.quit()
